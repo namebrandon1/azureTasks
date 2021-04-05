@@ -1,0 +1,30 @@
+{
+	"name": "SourceDataset_6rf",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sql_on_premise_LS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "CurrencyKey",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CurrencyAlternateKey",
+				"type": "nchar"
+			},
+			{
+				"name": "CurrencyName",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimCurrency"
+		}
+	}
+}
