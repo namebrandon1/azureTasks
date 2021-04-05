@@ -1,0 +1,6 @@
+{
+	"name": "OnPremiseSSMS",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
