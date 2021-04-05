@@ -1907,56 +1907,6 @@
 											"parameters": {}
 										}
 									]
-								},
-								{
-									"name": "Copy data2",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "7.00:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "SqlServerSource",
-											"sqlReaderQuery": {
-												"value": "SELECT [EmployeeKey]\n      ,[SalesTerritoryKey]\n      ,[FirstName]\n      ,[LastName]\n      ,[LoginID]\n      ,[EmailAddress]\n      ,[Gender]\n      ,[DepartmentName] FROM [dbo].[DimEmployee] where DepartmentName = '@{item().Dname}'",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "AzureSqlSink"
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "lookup_DeparmentName_DS",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "From_OnPremise_To_Azure_SQL",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
 								}
 							]
 						}
@@ -1966,8 +1916,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/lookup_DeparmentName_DS')]",
-				"[concat(variables('factoryId'), '/datasets/Depatment_name_Output_DS')]",
-				"[concat(variables('factoryId'), '/datasets/From_OnPremise_To_Azure_SQL')]"
+				"[concat(variables('factoryId'), '/datasets/Depatment_name_Output_DS')]"
 			]
 		}
 	]
