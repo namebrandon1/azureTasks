@@ -1741,13 +1741,19 @@
 					"referenceName": "SQLDatasetLS",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"name": {
+						"type": "string",
+						"defaultValue": "@{item().Dname}"
+					}
+				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
 					"schema": "awd",
 					"table": {
-						"value": "@{item().Dname}",
+						"value": "@dataset().name",
 						"type": "Expression"
 					}
 				}
