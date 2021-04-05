@@ -1,5 +1,5 @@
 {
-	"name": "From_OnPremise_To_Azure_SQL",
+	"name": "azure_destination_DS",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "SQLDatasetLS",
@@ -10,10 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "awd",
-			"table": {
-				"value": "@{item().Dname}",
-				"type": "Expression"
-			}
+			"table": "@{item().Dname}"
 		}
 	}
 }
