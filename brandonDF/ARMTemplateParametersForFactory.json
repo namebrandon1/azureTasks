@@ -8,6 +8,12 @@
 		"SQLDatasetLS_connectionString": {
 			"value": ""
 		},
+		"SQL_onPremise_ADW_LS_connectionString": {
+			"value": ""
+		},
+		"SQL_onPremise_ADW_LS_password": {
+			"value": ""
+		},
 		"StorageAccountLS_connectionString": {
 			"value": ""
 		},
@@ -16,6 +22,9 @@
 		},
 		"sql_on_premise_LS_password": {
 			"value": ""
+		},
+		"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
+			"value": "LAPTOP-EAKIJQ76\\brand"
 		},
 		"sql_on_premise_LS_properties_typeProperties_userName": {
 			"value": "LAPTOP-EAKIJQ76\\brand"

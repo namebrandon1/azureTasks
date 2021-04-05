@@ -11,6 +11,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SQLDatasetLS'"
 		},
+		"SQL_onPremise_ADW_LS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SQL_onPremise_ADW_LS'"
+		},
+		"SQL_onPremise_ADW_LS_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQL_onPremise_ADW_LS'"
+		},
 		"StorageAccountLS_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'StorageAccountLS'"
@@ -22,6 +30,10 @@
 		"sql_on_premise_LS_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'sql_on_premise_LS'"
+		},
+		"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "LAPTOP-EAKIJQ76\\brand"
 		},
 		"sql_on_premise_LS_properties_typeProperties_userName": {
 			"type": "string",
@@ -60,11 +72,20 @@
 					"StorageAccountLS_connectionString": {
 						"value": "[parameters('StorageAccountLS_connectionString')]"
 					},
+					"SQL_onPremise_ADW_LS_connectionString": {
+						"value": "[parameters('SQL_onPremise_ADW_LS_connectionString')]"
+					},
+					"SQL_onPremise_ADW_LS_password": {
+						"value": "[parameters('SQL_onPremise_ADW_LS_password')]"
+					},
 					"sql_on_premise_LS_connectionString": {
 						"value": "[parameters('sql_on_premise_LS_connectionString')]"
 					},
 					"sql_on_premise_LS_password": {
 						"value": "[parameters('sql_on_premise_LS_password')]"
+					},
+					"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
+						"value": "[parameters('SQL_onPremise_ADW_LS_properties_typeProperties_userName')]"
 					},
 					"sql_on_premise_LS_properties_typeProperties_userName": {
 						"value": "[parameters('sql_on_premise_LS_properties_typeProperties_userName')]"

@@ -11,6 +11,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SQLDatasetLS'"
 		},
+		"SQL_onPremise_ADW_LS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SQL_onPremise_ADW_LS'"
+		},
+		"SQL_onPremise_ADW_LS_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'SQL_onPremise_ADW_LS'"
+		},
 		"StorageAccountLS_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'StorageAccountLS'"
@@ -22,6 +30,10 @@
 		"sql_on_premise_LS_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'sql_on_premise_LS'"
+		},
+		"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "LAPTOP-EAKIJQ76\\brand"
 		},
 		"sql_on_premise_LS_properties_typeProperties_userName": {
 			"type": "string",
@@ -1151,6 +1163,126 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Generate_Department_table')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "select distinct DepartmentName as Dname from dbo.DimEmployee",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "lookup_DeparmentName_DS",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"sqlReaderQuery": {
+												"value": "SELECT * FROM dbo.DimEmployee where DepartmentName='@{item().Dname}'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "lookup_DeparmentName_DS",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Depatment_name_Output_DS",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/lookup_DeparmentName_DS')]",
+				"[concat(variables('factoryId'), '/datasets/Depatment_name_Output_DS')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ASQL_Dest')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1166,6 +1298,54 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SQLDatasetLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDatasetLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDatasetLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Depatment_name_Output_DS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "StorageAccountLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@{item().Dname}",
+							"type": "Expression"
+						},
+						"container": "department"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/StorageAccountLS')]"
 			]
 		},
 		{
@@ -1477,6 +1657,160 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/lookup_DeparmentName_DS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sql_on_premise_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "EmployeeKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ParentEmployeeKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EmployeeNationalIDAlternateKey",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ParentEmployeeNationalIDAlternateKey",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesTerritoryKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NameStyle",
+						"type": "bit"
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HireDate",
+						"type": "date"
+					},
+					{
+						"name": "BirthDate",
+						"type": "date"
+					},
+					{
+						"name": "LoginID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MaritalStatus",
+						"type": "nchar"
+					},
+					{
+						"name": "EmergencyContactName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmergencyContactPhone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalariedFlag",
+						"type": "bit"
+					},
+					{
+						"name": "Gender",
+						"type": "nchar"
+					},
+					{
+						"name": "PayFrequency",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "BaseRate",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "VacationHours",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "SickLeaveHours",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "CurrentFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SalesPersonFlag",
+						"type": "bit"
+					},
+					{
+						"name": "DepartmentName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StartDate",
+						"type": "date"
+					},
+					{
+						"name": "EndDate",
+						"type": "date"
+					},
+					{
+						"name": "Status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmployeePhoto",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimEmployee"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sql_on_premise_LS')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SQLDatasetLS')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1488,6 +1822,30 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQL_onPremise_ADW_LS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SQL_onPremise_ADW_LS_connectionString')]",
+					"userName": "[parameters('SQL_onPremise_ADW_LS_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('SQL_onPremise_ADW_LS_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "OnPremiseRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/OnPremiseRuntime')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/StorageAccountLS')]",
