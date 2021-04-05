@@ -1,0 +1,6 @@
+{
+	"name": "OnPremiseRuntime",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
