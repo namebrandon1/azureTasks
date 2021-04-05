@@ -1,0 +1,16 @@
+{
+	"name": "From_OnPremise_To_Azure_SQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDatasetLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "awd",
+			"table": "@{item().Dname}"
+		}
+	}
+}
