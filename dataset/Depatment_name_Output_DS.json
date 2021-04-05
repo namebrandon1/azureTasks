@@ -10,11 +10,15 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "@{item().Dname}",
+				"fileName": {
+					"value": "@{item().Dname}",
+					"type": "Expression"
+				},
 				"container": "department"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []
