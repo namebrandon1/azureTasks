@@ -1842,7 +1842,7 @@
 										"source": {
 											"type": "SqlServerSource",
 											"sqlReaderQuery": {
-												"value": "SELECT * FROM dbo.DimEmployee where DepartmentName='@{item().Dname}'",
+												"value": "SELECT [EmployeeKey]\n      ,[SalesTerritoryKey]\n      ,[FirstName]\n      ,[LastName]\n      ,[LoginID]\n      ,[EmailAddress]\n      ,[Gender]\n      ,[DepartmentName] FROM [dbo].[DimEmployee] where DepartmentName = '@{item().Dname}'",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
