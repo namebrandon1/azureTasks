@@ -5,12 +5,21 @@
 			"referenceName": "SQLDatasetLS",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"name": {
+				"type": "string",
+				"defaultValue": "@{item().Dname}"
+			}
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
 			"schema": "awd",
-			"table": "@{item().Dname}"
+			"table": {
+				"value": "@dataset().name",
+				"type": "Expression"
+			}
 		}
 	}
 }
