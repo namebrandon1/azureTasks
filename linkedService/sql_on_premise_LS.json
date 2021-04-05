@@ -1,0 +1,17 @@
+{
+	"name": "sql_on_premise_LS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=True;data source=LAPTOP-EAKIJQ76\\BRANDON;initial catalog=AdventureWorksDW2012",
+			"userName": "LAPTOP-EAKIJQ76\\brand",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIyZDI5NTM0My0yNjczLTQxNjktYTA4MC0zZGQyYWQ3OTRmM2YiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "OnPremiseRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
