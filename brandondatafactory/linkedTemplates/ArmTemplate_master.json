@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'StorageAccountLS'"
 		},
+		"azureSQL_EmptyDS_LS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'azureSQL_EmptyDS_LS'"
+		},
 		"sql_on_premise_LS_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'sql_on_premise_LS'"
@@ -71,6 +75,9 @@
 					},
 					"StorageAccountLS_connectionString": {
 						"value": "[parameters('StorageAccountLS_connectionString')]"
+					},
+					"azureSQL_EmptyDS_LS_connectionString": {
+						"value": "[parameters('azureSQL_EmptyDS_LS_connectionString')]"
 					},
 					"SQL_onPremise_ADW_LS_connectionString": {
 						"value": "[parameters('SQL_onPremise_ADW_LS_connectionString')]"

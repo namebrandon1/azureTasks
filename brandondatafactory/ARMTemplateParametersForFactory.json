@@ -17,6 +17,9 @@
 		"StorageAccountLS_connectionString": {
 			"value": ""
 		},
+		"azureSQL_EmptyDS_LS_connectionString": {
+			"value": ""
+		},
 		"sql_on_premise_LS_connectionString": {
 			"value": ""
 		},

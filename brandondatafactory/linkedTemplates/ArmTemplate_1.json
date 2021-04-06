@@ -13,6 +13,1276 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_pny')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sql_on_premise_LS",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lookup_DeparmentName_DS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sql_on_premise_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "EmployeeKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ParentEmployeeKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "EmployeeNationalIDAlternateKey",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ParentEmployeeNationalIDAlternateKey",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesTerritoryKey",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NameStyle",
+						"type": "bit"
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HireDate",
+						"type": "date"
+					},
+					{
+						"name": "BirthDate",
+						"type": "date"
+					},
+					{
+						"name": "LoginID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MaritalStatus",
+						"type": "nchar"
+					},
+					{
+						"name": "EmergencyContactName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmergencyContactPhone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalariedFlag",
+						"type": "bit"
+					},
+					{
+						"name": "Gender",
+						"type": "nchar"
+					},
+					{
+						"name": "PayFrequency",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "BaseRate",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "VacationHours",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "SickLeaveHours",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "CurrentFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SalesPersonFlag",
+						"type": "bit"
+					},
+					{
+						"name": "DepartmentName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StartDate",
+						"type": "date"
+					},
+					{
+						"name": "EndDate",
+						"type": "date"
+					},
+					{
+						"name": "Status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmployeePhoto",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimEmployee"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SCD dataflow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SalesLT_azure_SQL_DS",
+								"type": "DatasetReference"
+							},
+							"name": "SalesLTCustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable2",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomersSource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable2",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumn1"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "Lookup1"
+						},
+						{
+							"name": "DerivedColumn2"
+						},
+						{
+							"name": "AlterRow1"
+						}
+					],
+					"script": "source(output(\n\t\tCustomerID as integer,\n\t\tNameStyle as boolean,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SalesLTCustomer\nsource(output(\n\t\tCustomerID as integer,\n\t\tTitle as string,\n\t\tFIrstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DimCustomersSource\nSalesLTCustomer derive(CreatedHash = sha1(FirstName+LastName+CompanyName)) ~> DerivedColumn1\nDerivedColumn1, DimCustomersSource exists(CreatedHash == HashKey,\n\tnegate:false,\n\tbroadcast: 'auto')~> Exists1\nExists1, DimCustomersSource lookup(SalesLTCustomer@CustomerID == DimCustomersSource@CustomerID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 derive(InsertedDate = iif(isNull(InsertedDate), (currentTimestamp()), (InsertedDate)),\n\t\tUpdatedDate = currentTimestamp()) ~> DerivedColumn2\nDerivedColumn2 alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tCustomerID as integer,\n\t\tTitle as string,\n\t\tFIrstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tformat: 'table',\n\tmapColumn(\n\t\tCustomerID = SalesLTCustomer@CustomerID,\n\t\tTitle = SalesLTCustomer@Title,\n\t\tFIrstName = SalesLTCustomer@FirstName,\n\t\tMiddleName = SalesLTCustomer@MiddleName,\n\t\tLastName = SalesLTCustomer@LastName,\n\t\tInsertedDate,\n\t\tUpdatedDate,\n\t\tHashKey = CreatedHash\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_From_OnPremise_To_ASQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach_pny",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_pny",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "dbo.@{item().destination.table}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"tableOption": "autoCreate"
+										},
+										"enableStaging": false,
+										"validateDataConsistency": false,
+										"translator": {
+											"value": "@item().copyActivity.translator",
+											"type": "Expression"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_pny",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_pny",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().destination.table"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "DimProduct"
+								},
+								"destination": {
+									"table": "DimProduct"
+								},
+								"copyActivity": {
+									"translator": {
+										"type": "TabularTranslator",
+										"mappings": [
+											{
+												"source": {
+													"name": "ProductKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductAlternateKey",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "ProductAlternateKey",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductSubcategoryKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductSubcategoryKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "WeightUnitMeasureCode",
+													"type": "String",
+													"physicalType": "nchar"
+												},
+												"sink": {
+													"name": "WeightUnitMeasureCode",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SizeUnitMeasureCode",
+													"type": "String",
+													"physicalType": "nchar"
+												},
+												"sink": {
+													"name": "SizeUnitMeasureCode",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "EnglishProductName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "EnglishProductName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SpanishProductName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "SpanishProductName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "FrenchProductName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "FrenchProductName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "StandardCost",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "StandardCost",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "FinishedGoodsFlag",
+													"type": "Boolean",
+													"physicalType": "bit"
+												},
+												"sink": {
+													"name": "FinishedGoodsFlag",
+													"type": "Boolean"
+												}
+											},
+											{
+												"source": {
+													"name": "Color",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "Color",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SafetyStockLevel",
+													"type": "Int16",
+													"physicalType": "smallint"
+												},
+												"sink": {
+													"name": "SafetyStockLevel",
+													"type": "Int16"
+												}
+											},
+											{
+												"source": {
+													"name": "ReorderPoint",
+													"type": "Int16",
+													"physicalType": "smallint"
+												},
+												"sink": {
+													"name": "ReorderPoint",
+													"type": "Int16"
+												}
+											},
+											{
+												"source": {
+													"name": "ListPrice",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "ListPrice",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "Size",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "Size",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SizeRange",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "SizeRange",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "Weight",
+													"type": "Double",
+													"physicalType": "float"
+												},
+												"sink": {
+													"name": "Weight",
+													"type": "Double"
+												}
+											},
+											{
+												"source": {
+													"name": "DaysToManufacture",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "DaysToManufacture",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductLine",
+													"type": "String",
+													"physicalType": "nchar"
+												},
+												"sink": {
+													"name": "ProductLine",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "DealerPrice",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "DealerPrice",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "Class",
+													"type": "String",
+													"physicalType": "nchar"
+												},
+												"sink": {
+													"name": "Class",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "Style",
+													"type": "String",
+													"physicalType": "nchar"
+												},
+												"sink": {
+													"name": "Style",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "ModelName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "ModelName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "LargePhoto",
+													"type": "Byte[]",
+													"physicalType": "varbinary"
+												},
+												"sink": {
+													"name": "LargePhoto",
+													"type": "Byte[]"
+												}
+											},
+											{
+												"source": {
+													"name": "EnglishDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "EnglishDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "FrenchDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "FrenchDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "ChineseDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "ChineseDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "ArabicDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "ArabicDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "HebrewDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "HebrewDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "ThaiDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "ThaiDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "GermanDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "GermanDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "JapaneseDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "JapaneseDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "TurkishDescription",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "TurkishDescription",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "StartDate",
+													"type": "DateTime",
+													"physicalType": "datetime"
+												},
+												"sink": {
+													"name": "StartDate",
+													"type": "DateTime"
+												}
+											},
+											{
+												"source": {
+													"name": "EndDate",
+													"type": "DateTime",
+													"physicalType": "datetime"
+												},
+												"sink": {
+													"name": "EndDate",
+													"type": "DateTime"
+												}
+											},
+											{
+												"source": {
+													"name": "Status",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "Status",
+													"type": "String"
+												}
+											}
+										],
+										"typeConversion": true,
+										"typeConversionSettings": {
+											"allowDataTruncation": true,
+											"treatBooleanAsNumber": false
+										}
+									}
+								}
+							},
+							{
+								"source": {
+									"table": "DimProductCategory"
+								},
+								"destination": {
+									"table": "DimProductCategory"
+								},
+								"copyActivity": {
+									"translator": {
+										"type": "TabularTranslator",
+										"mappings": [
+											{
+												"source": {
+													"name": "ProductCategoryKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductCategoryKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductCategoryAlternateKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductCategoryAlternateKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "EnglishProductCategoryName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "EnglishProductCategoryName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SpanishProductCategoryName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "SpanishProductCategoryName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "FrenchProductCategoryName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "FrenchProductCategoryName",
+													"type": "String"
+												}
+											}
+										],
+										"typeConversion": true,
+										"typeConversionSettings": {
+											"allowDataTruncation": true,
+											"treatBooleanAsNumber": false
+										}
+									}
+								}
+							},
+							{
+								"source": {
+									"table": "DimProductSubcategory"
+								},
+								"destination": {
+									"table": "DimProductSubcategory"
+								},
+								"copyActivity": {
+									"translator": {
+										"type": "TabularTranslator",
+										"mappings": [
+											{
+												"source": {
+													"name": "ProductSubcategoryKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductSubcategoryKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductSubcategoryAlternateKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductSubcategoryAlternateKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "EnglishProductSubcategoryName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "EnglishProductSubcategoryName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SpanishProductSubcategoryName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "SpanishProductSubcategoryName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "FrenchProductSubcategoryName",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "FrenchProductSubcategoryName",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductCategoryKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductCategoryKey",
+													"type": "Int32"
+												}
+											}
+										],
+										"typeConversion": true,
+										"typeConversionSettings": {
+											"allowDataTruncation": true,
+											"treatBooleanAsNumber": false
+										}
+									}
+								}
+							},
+							{
+								"source": {
+									"table": "FactInternetSales"
+								},
+								"destination": {
+									"table": "FactInternetSales"
+								},
+								"copyActivity": {
+									"translator": {
+										"type": "TabularTranslator",
+										"mappings": [
+											{
+												"source": {
+													"name": "ProductKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ProductKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "OrderDateKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "OrderDateKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "DueDateKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "DueDateKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "ShipDateKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "ShipDateKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "CustomerKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "CustomerKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "PromotionKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "PromotionKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "CurrencyKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "CurrencyKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "SalesTerritoryKey",
+													"type": "Int32",
+													"physicalType": "int"
+												},
+												"sink": {
+													"name": "SalesTerritoryKey",
+													"type": "Int32"
+												}
+											},
+											{
+												"source": {
+													"name": "SalesOrderNumber",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "SalesOrderNumber",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "SalesOrderLineNumber",
+													"type": "Byte",
+													"physicalType": "tinyint"
+												},
+												"sink": {
+													"name": "SalesOrderLineNumber",
+													"type": "Byte"
+												}
+											},
+											{
+												"source": {
+													"name": "RevisionNumber",
+													"type": "Byte",
+													"physicalType": "tinyint"
+												},
+												"sink": {
+													"name": "RevisionNumber",
+													"type": "Byte"
+												}
+											},
+											{
+												"source": {
+													"name": "OrderQuantity",
+													"type": "Int16",
+													"physicalType": "smallint"
+												},
+												"sink": {
+													"name": "OrderQuantity",
+													"type": "Int16"
+												}
+											},
+											{
+												"source": {
+													"name": "UnitPrice",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "UnitPrice",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "ExtendedAmount",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "ExtendedAmount",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "UnitPriceDiscountPct",
+													"type": "Double",
+													"physicalType": "float"
+												},
+												"sink": {
+													"name": "UnitPriceDiscountPct",
+													"type": "Double"
+												}
+											},
+											{
+												"source": {
+													"name": "DiscountAmount",
+													"type": "Double",
+													"physicalType": "float"
+												},
+												"sink": {
+													"name": "DiscountAmount",
+													"type": "Double"
+												}
+											},
+											{
+												"source": {
+													"name": "ProductStandardCost",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "ProductStandardCost",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "TotalProductCost",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "TotalProductCost",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "SalesAmount",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "SalesAmount",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "TaxAmt",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "TaxAmt",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "Freight",
+													"type": "Decimal",
+													"physicalType": "money",
+													"scale": 4,
+													"precision": 19
+												},
+												"sink": {
+													"name": "Freight",
+													"type": "Decimal"
+												}
+											},
+											{
+												"source": {
+													"name": "CarrierTrackingNumber",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "CarrierTrackingNumber",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "CustomerPONumber",
+													"type": "String",
+													"physicalType": "nvarchar"
+												},
+												"sink": {
+													"name": "CustomerPONumber",
+													"type": "String"
+												}
+											},
+											{
+												"source": {
+													"name": "OrderDate",
+													"type": "DateTime",
+													"physicalType": "datetime"
+												},
+												"sink": {
+													"name": "OrderDate",
+													"type": "DateTime"
+												}
+											},
+											{
+												"source": {
+													"name": "DueDate",
+													"type": "DateTime",
+													"physicalType": "datetime"
+												},
+												"sink": {
+													"name": "DueDate",
+													"type": "DateTime"
+												}
+											},
+											{
+												"source": {
+													"name": "ShipDate",
+													"type": "DateTime",
+													"physicalType": "datetime"
+												},
+												"sink": {
+													"name": "ShipDate",
+													"type": "DateTime"
+												}
+											}
+										],
+										"typeConversion": true,
+										"typeConversionSettings": {
+											"allowDataTruncation": true,
+											"treatBooleanAsNumber": false
+										}
+									}
+								}
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_pny')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Customer_SCD')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SCD dataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SCD dataflow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"SalesLTCustomer": {},
+									"DimCustomersSource": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SCD dataflow')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Generate_Department_table')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -180,7 +1450,9 @@
 				],
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/lookup_DeparmentName_DS')]"
+			]
 		}
 	]
 }
