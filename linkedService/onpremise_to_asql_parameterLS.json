@@ -1,0 +1,35 @@
+{
+	"name": "onpremise_to_asql_parameterLS",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"servername": {
+				"type": "String",
+				"defaultValue": "LAPTOP-EAKIJQ76\\BRANDON"
+			},
+			"username": {
+				"type": "String",
+				"defaultValue": "LAPTOP-EAKIJQ76\\brand"
+			},
+			"password": {
+				"type": "String",
+				"defaultValue": "shanu1311"
+			},
+			"databasename": {
+				"type": "String",
+				"defaultValue": "AdventureWorks2012"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=True;Data Source=@{linkedService().servername};Initial Catalog=@{linkedService().databasename}",
+			"userName": "@{linkedService().username}",
+			"password": "@{linkedService().password}"
+		},
+		"connectVia": {
+			"referenceName": "OnPremiseIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
