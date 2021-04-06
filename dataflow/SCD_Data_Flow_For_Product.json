@@ -1,0 +1,40 @@
+{
+	"name": "SCD_Data_Flow_For_Product",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "salesLT_Product_Azure_DS",
+						"type": "DatasetReference"
+					},
+					"name": "SalesLTProduct"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dim_PRODUCT_UPdated_DS",
+						"type": "DatasetReference"
+					},
+					"name": "DimProduct"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "DerivedColumn1"
+				},
+				{
+					"name": "Exists1"
+				},
+				{
+					"name": "Lookup1"
+				},
+				{
+					"name": "DerivedColumn2"
+				}
+			],
+			"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(19,4),\n\t\tListPrice as decimal(19,4),\n\t\tSize as string,\n\t\tWeight as decimal(8,2),\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as timestamp,\n\t\tSellEndDate as timestamp,\n\t\tDiscontinuedDate as timestamp,\n\t\tThumbNailPhoto as binary,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SalesLTProduct\nsource(output(\n\t\tProductID as integer,\n\t\tPName as string,\n\t\tProductNumber as string,\n\t\tcolor as string,\n\t\tStandardCost as integer,\n\t\tListPrice as integer,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DimProduct\nSalesLTProduct derive(CreatedHash = sha1(Name+Color+ProductNumber+Size)) ~> DerivedColumn1\nDerivedColumn1, DimProduct exists(CreatedHash == HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, DimProduct lookup(SalesLTProduct@ProductID == DimProduct@ProductID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 derive() ~> DerivedColumn2"
+		}
+	}
+}
