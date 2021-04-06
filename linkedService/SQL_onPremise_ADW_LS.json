@@ -7,10 +7,10 @@
 		"typeProperties": {
 			"connectionString": "integrated security=True;data source=LAPTOP-EAKIJQ76\\BRANDON;initial catalog=AdventureWorks2012",
 			"userName": "LAPTOP-EAKIJQ76\\brand",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJiOGM2NTVjMC1kNTk3LTQ4Y2UtYTNkMC00NDA3Y2JjNzdlOGYiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJiNzgwNGM2NS0zNzM1LTQwZWMtOTQxMi0zOWVlN2U3ODNmNGQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
 		},
 		"connectVia": {
-			"referenceName": "OnPremiseRuntime",
+			"referenceName": "OnPremiseIR",
 			"type": "IntegrationRuntimeReference"
 		}
 	}
