@@ -1,0 +1,12 @@
+{
+	"name": "empty_dest_DS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQLDatasetLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
