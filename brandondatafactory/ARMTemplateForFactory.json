@@ -1294,7 +1294,8 @@
 											"partitionOption": "None"
 										},
 										"sink": {
-											"type": "AzureSqlSink"
+											"type": "AzureSqlSink",
+											"tableOption": "autoCreate"
 										},
 										"enableStaging": false,
 										"translator": {
@@ -1753,7 +1754,7 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
-					"schema": "",
+					"schema": "awd",
 					"table": {
 						"value": "@dataset().name",
 						"type": "Expression"
