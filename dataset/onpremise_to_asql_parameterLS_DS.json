@@ -3,7 +3,13 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "onpremise_to_asql_parameterLS",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"servername": "LAPTOP-EAKIJQ76\\BRANDON",
+				"username": "LAPTOP-EAKIJQ76\\brand",
+				"password": "shanu1311",
+				"databasename": "AdventureWorks2012"
+			}
 		},
 		"annotations": [],
 		"type": "SqlServerTable",
@@ -50,8 +56,8 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "Person",
-			"table": "Address"
+			"schema": "Sales",
+			"table": "Customer"
 		}
 	}
 }
