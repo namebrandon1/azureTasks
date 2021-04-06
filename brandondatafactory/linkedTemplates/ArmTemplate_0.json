@@ -289,7 +289,7 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {
-					"schema": "awd",
+					"schema": "",
 					"table": {
 						"value": "@dataset().name",
 						"type": "Expression"
