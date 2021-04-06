@@ -1,0 +1,29 @@
+{
+	"name": "Lookup_for_excele_sheets_DS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "StorageAccountLS",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sheet": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": {
+				"value": "@dataset().SheetName",
+				"type": "Expression"
+			},
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Customer.xlsx",
+				"container": "sheet"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	}
+}
