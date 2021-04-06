@@ -13,6 +13,127 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/CopySalesLT_from_SQL_to_SA')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup_SalesLT_Table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT QUOTENAME(table_Schema)+'.'+QUOTENAME(TABLE_NAME) AS Table_Name FROM information_Schema.tables where table_Schema = 'SalesLT'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SalesLTDS",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Iterate each table from lookup",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup_SalesLT_Table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup_SalesLT_Table').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "copt from sql to sa",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT * FROM @{item().Table_Name}",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SalesLTDS",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Storage_SalesLT_DS",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"annotations": [],
+				"lastPublishTime": "2021-04-05T05:55:28Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/On_Premise_DW_DS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -431,14 +552,14 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "AZURE_SALESLT_PRODUCT_DS",
+								"referenceName": "SALESLT_Product_DS",
 								"type": "DatasetReference"
 							},
 							"name": "SalesLTProduct"
 						},
 						{
 							"dataset": {
-								"referenceName": "AZURE_PRODUCT_SAMPLE_SCD",
+								"referenceName": "Dim_Product_DS",
 								"type": "DatasetReference"
 							},
 							"name": "DimProduct"
@@ -447,7 +568,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "AZURE_PRODUCT_SAMPLE_SCD",
+								"referenceName": "Dim_Product_DS",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
@@ -470,7 +591,7 @@
 							"name": "AlterRow1"
 						}
 					],
-					"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(19,4),\n\t\tListPrice as decimal(19,4),\n\t\tSize as string,\n\t\tWeight as decimal(8,2),\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as timestamp,\n\t\tSellEndDate as timestamp,\n\t\tDiscontinuedDate as timestamp,\n\t\tThumbNailPhoto as binary,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SalesLTProduct\nsource(output(\n\t\tProductID as integer,\n\t\tPName as string,\n\t\tProductNumber as string,\n\t\tcolor as string,\n\t\tStandardCost as integer,\n\t\tListPrice as integer,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DimProduct\nSalesLTProduct derive(CreatedHash = sha1(Name+Color+ProductNumber+Size)) ~> DerivedColumn1\nDerivedColumn1, DimProduct exists(CreatedHash == HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, DimProduct lookup(SalesLTProduct@ProductID == DimProduct@ProductID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 derive(InsertedDate = iif(isNull(InsertedDate), (currentTimestamp()), (InsertedDate)),\n\t\tUpdatedDate = currentTimestamp()) ~> DerivedColumn2\nDerivedColumn2 alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tProductID as integer,\n\t\tPName as string,\n\t\tProductNumber as string,\n\t\tcolor as string,\n\t\tStandardCost as integer,\n\t\tListPrice as integer,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tmapColumn(\n\t\tProductID = SalesLTProduct@ProductID,\n\t\tProductNumber = SalesLTProduct@ProductNumber,\n\t\tcolor = SalesLTProduct@Color,\n\t\tStandardCost = SalesLTProduct@StandardCost,\n\t\tListPrice = SalesLTProduct@ListPrice,\n\t\tInsertedDate,\n\t\tUpdatedDate,\n\t\tHashKey\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
+					"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as decimal(19,4),\n\t\tListPrice as decimal(19,4),\n\t\tSize as string,\n\t\tWeight as decimal(8,2),\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as timestamp,\n\t\tSellEndDate as timestamp,\n\t\tDiscontinuedDate as timestamp,\n\t\tThumbNailPhoto as binary,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> SalesLTProduct\nsource(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tcolor as string,\n\t\tStandardCost as integer,\n\t\tListPrice as integer,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> DimProduct\nSalesLTProduct derive(CreatedHash = sha1(Name+Color)) ~> DerivedColumn1\nDerivedColumn1, DimProduct exists(CreatedHash == HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nExists1, DimProduct lookup(SalesLTProduct@ProductID == DimProduct@ProductID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> Lookup1\nLookup1 derive(InsertedDate = iif(isNull(InsertedDate), (currentTimestamp()), (InsertedDate)),\n\t\tUpdatedDate = currentTimestamp()) ~> DerivedColumn2\nDerivedColumn2 alterRow(upsertIf(true())) ~> AlterRow1\nAlterRow1 sink(input(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tcolor as string,\n\t\tStandardCost as integer,\n\t\tListPrice as integer,\n\t\tInsertedDate as timestamp,\n\t\tUpdatedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ProductID'],\n\tformat: 'table',\n\tmapColumn(\n\t\tProductID = SalesLTProduct@ProductID,\n\t\tName = SalesLTProduct@Name,\n\t\tProductNumber = SalesLTProduct@ProductNumber,\n\t\tcolor = SalesLTProduct@Color,\n\t\tStandardCost = SalesLTProduct@StandardCost,\n\t\tListPrice = SalesLTProduct@ListPrice,\n\t\tInsertedDate,\n\t\tUpdatedDate,\n\t\tHashKey = CreatedHash\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sink1"
 				}
 			},
 			"dependsOn": []
