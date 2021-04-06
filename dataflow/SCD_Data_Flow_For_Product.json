@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "SALESLT.Product.DS",
+						"referenceName": "SALESLT_Product_DS",
 						"type": "DatasetReference"
 					},
 					"name": "SalesLTProduct"
