@@ -510,7 +510,72 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/salesLT_Product_Azure_DS')]",
+			"name": "[concat(parameters('factoryName'), '/AZURE_PRODUCT_SAMPLE_SCD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "azureSQL_EmptyDS_LS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PName",
+						"type": "varchar"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "varchar"
+					},
+					{
+						"name": "color",
+						"type": "varchar"
+					},
+					{
+						"name": "StandardCost",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ListPrice",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "InsertedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HashKey",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimProduct"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/azureSQL_EmptyDS_LS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AZURE_SALESLT_PRODUCT_DS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -614,71 +679,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SQLDatasetLS')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Dim_PRODUCT_UPdated_DS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "azureSQL_EmptyDS_LS",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ProductID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "PName",
-						"type": "varchar"
-					},
-					{
-						"name": "ProductNumber",
-						"type": "varchar"
-					},
-					{
-						"name": "color",
-						"type": "varchar"
-					},
-					{
-						"name": "StandardCost",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ListPrice",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "InsertedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "UpdatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "HashKey",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DimProduct"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/azureSQL_EmptyDS_LS')]"
 			]
 		},
 		{
