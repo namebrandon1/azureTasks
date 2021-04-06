@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'azureSQL_EmptyDS_LS'"
 		},
+		"onpremise_to_asql_parameterLS_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'onpremise_to_asql_parameterLS'"
+		},
 		"sql_on_premise_LS_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'sql_on_premise_LS'"
@@ -38,6 +42,10 @@
 		"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "LAPTOP-EAKIJQ76\\brand"
+		},
+		"onpremise_to_asql_parameterLS_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().username}"
 		},
 		"sql_on_premise_LS_properties_typeProperties_userName": {
 			"type": "string",
@@ -85,17 +93,8 @@
 					"SQL_onPremise_ADW_LS_password": {
 						"value": "[parameters('SQL_onPremise_ADW_LS_password')]"
 					},
-					"sql_on_premise_LS_connectionString": {
-						"value": "[parameters('sql_on_premise_LS_connectionString')]"
-					},
-					"sql_on_premise_LS_password": {
-						"value": "[parameters('sql_on_premise_LS_password')]"
-					},
 					"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
 						"value": "[parameters('SQL_onPremise_ADW_LS_properties_typeProperties_userName')]"
-					},
-					"sql_on_premise_LS_properties_typeProperties_userName": {
-						"value": "[parameters('sql_on_premise_LS_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -114,6 +113,21 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"onpremise_to_asql_parameterLS_connectionString": {
+						"value": "[parameters('onpremise_to_asql_parameterLS_connectionString')]"
+					},
+					"sql_on_premise_LS_connectionString": {
+						"value": "[parameters('sql_on_premise_LS_connectionString')]"
+					},
+					"sql_on_premise_LS_password": {
+						"value": "[parameters('sql_on_premise_LS_password')]"
+					},
+					"onpremise_to_asql_parameterLS_properties_typeProperties_userName": {
+						"value": "[parameters('onpremise_to_asql_parameterLS_properties_typeProperties_userName')]"
+					},
+					"sql_on_premise_LS_properties_typeProperties_userName": {
+						"value": "[parameters('sql_on_premise_LS_properties_typeProperties_userName')]"
 					}
 				}
 			},

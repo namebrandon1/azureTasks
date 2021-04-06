@@ -20,6 +20,9 @@
 		"azureSQL_EmptyDS_LS_connectionString": {
 			"value": ""
 		},
+		"onpremise_to_asql_parameterLS_connectionString": {
+			"value": ""
+		},
 		"sql_on_premise_LS_connectionString": {
 			"value": ""
 		},
@@ -28,6 +31,9 @@
 		},
 		"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
 			"value": "LAPTOP-EAKIJQ76\\brand"
+		},
+		"onpremise_to_asql_parameterLS_properties_typeProperties_userName": {
+			"value": "@{linkedService().username}"
 		},
 		"sql_on_premise_LS_properties_typeProperties_userName": {
 			"value": "LAPTOP-EAKIJQ76\\brand"

@@ -27,19 +27,7 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'SQL_onPremise_ADW_LS'"
 		},
-		"sql_on_premise_LS_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'sql_on_premise_LS'"
-		},
-		"sql_on_premise_LS_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'sql_on_premise_LS'"
-		},
 		"SQL_onPremise_ADW_LS_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "LAPTOP-EAKIJQ76\\brand"
-		},
-		"sql_on_premise_LS_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "LAPTOP-EAKIJQ76\\brand"
 		}
@@ -741,6 +729,27 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/empty_dest_DS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SQLDatasetLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Person",
+					"table": "Address"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SQLDatasetLS')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SQL_onPremise_ADW_LS')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -753,30 +762,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('SQL_onPremise_ADW_LS_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "OnPremiseIR",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/OnPremiseIR')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/sql_on_premise_LS')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('sql_on_premise_LS_connectionString')]",
-					"userName": "[parameters('sql_on_premise_LS_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('sql_on_premise_LS_password')]"
 					}
 				},
 				"connectVia": {
