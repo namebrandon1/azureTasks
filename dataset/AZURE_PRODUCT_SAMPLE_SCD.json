@@ -1,0 +1,60 @@
+{
+	"name": "AZURE_PRODUCT_SAMPLE_SCD",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azureSQL_EmptyDS_LS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ProductID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PName",
+				"type": "varchar"
+			},
+			{
+				"name": "ProductNumber",
+				"type": "varchar"
+			},
+			{
+				"name": "color",
+				"type": "varchar"
+			},
+			{
+				"name": "StandardCost",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ListPrice",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "InsertedDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "UpdatedDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "HashKey",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimProduct"
+		}
+	}
+}
